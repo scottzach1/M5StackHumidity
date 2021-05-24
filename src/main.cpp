@@ -1,3 +1,13 @@
+/**
+ *   ___  ___ ___ | |_| |_ ______ _  ___| |__ / |
+ *  / __|/ __/ _ \| __| __|_  / _` |/ __| '_ \| |
+ *  \__ \ (_| (_) | |_| |_ / / (_| | (__| | | | |
+ *  |___/\___\___/ \__|\__/___\__,_|\___|_| |_|_|
+ *
+ *       Zac Scott (github.com/scottzach1)
+ *
+ * M5StackTemperature - BLE Server for Temperature Sensor
+ */
 #include <BLE2902.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
@@ -167,7 +177,7 @@ void loop() {
 
     time(&timestamp);
     // Trigger duty cycle sleep only after threshold.
-    if (timestamp > sleepTarget) {
+    if (dutyCycle && timestamp > sleepTarget) {
         M5.Power.deepSleep(SLEEP_SEC(DUTY_CYCLE_SLEEP));
     }
 }
