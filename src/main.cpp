@@ -25,18 +25,24 @@ bool deviceConnected = false;
 /**
  * Duty Cycling Timeouts
  */
-const int DUTY_CYCLE_AWAKE = 4;  // seconds awake
-const int DUTY_CYCLE_SLEEP = 4;  // sedons asleep
+const int DUTY_CYCLE_AWAKE = 2;  // seconds awake
+const int DUTY_CYCLE_SLEEP = 4;  // seconds asleep
+const int ACTIVITY_TIMEOUT = 8;  // seconds after BLE activity
 
 /**
  * Safe memory (persistent through deepSleeps).
  */
 RTC_DATA_ATTR time_t timestamp = 0;
-RTC_DATA_ATTR time_t activityTimestamp = 0;
+RTC_DATA_ATTR time_t sleepTarget = 0;
 RTC_DATA_ATTR bool dutyCycle = false;
 
 // Safe previous reading buffers for persistent readings.
 RTC_DATA_ATTR uint8_t curHumi = 0;
+
+void prolongSleep(int seconds) {
+    time(&sleepTarget);
+    sleepTarget += seconds;
+}
 
 /**
  * Callbacks for when we connect/disconnect from client.
@@ -46,7 +52,7 @@ class MyServerCallbacks : public BLEServerCallbacks {
      * Update device connected state upon connection.
      */
     void onConnect(BLEServer *pServer) {
-        time(&activityTimestamp);
+        prolongSleep(ACTIVITY_TIMEOUT);
         M5.Lcd.println("client connected");
         deviceConnected = true;
     };
@@ -70,7 +76,7 @@ class MyServerCallbacks : public BLEServerCallbacks {
  * Generate a random humidity within boundaries, then update and return humidity buffer address.
  */
 uint8_t *updateRandHumi() {
-    time(&activityTimestamp);
+    prolongSleep(ACTIVITY_TIMEOUT);
     curHumi = (uint8_t)(rand() % 100);
     M5.Lcd.println(curHumi);
     return &curHumi;
@@ -129,7 +135,7 @@ void setup() {
     pService->start();
     pAdvertising->start();
 
-    time(&activityTimestamp);
+    prolongSleep(DUTY_CYCLE_AWAKE);
 }
 
 /**
@@ -146,7 +152,7 @@ void clearDisplay() {
 void toggleDutyCycle() {
     dutyCycle = !dutyCycle;
     M5.Lcd.println("SET DUTY_CYCLE " + String(dutyCycle));
-    time(&activityTimestamp);
+    prolongSleep(DUTY_CYCLE_AWAKE);
 }
 
 /**
@@ -161,7 +167,7 @@ void loop() {
 
     time(&timestamp);
     // Trigger duty cycle sleep only after threshold.
-    if (dutyCycle && timestamp - activityTimestamp > DUTY_CYCLE_AWAKE) {
+    if (timestamp > sleepTarget) {
         M5.Power.deepSleep(SLEEP_SEC(DUTY_CYCLE_SLEEP));
     }
 }
