@@ -25,7 +25,7 @@
  **/
 #ifndef DEBUG_MSG
 #define DEBUG_MSG(level, ...)      \
-    if (DEBUG && level >= DEBUG) { \
+    if (DEBUG && level <= DEBUG) { \
         M5.Lcd.print(__VA_ARGS__); \
     }
 #endif
@@ -34,7 +34,7 @@
  **/
 #ifndef DEBUG_MSG_LN
 #define DEBUG_MSG_LN(level, ...)     \
-    if (DEBUG && level >= DEBUG) {   \
+    if (DEBUG && level <= DEBUG) {   \
         M5.Lcd.println(__VA_ARGS__); \
     }
 #endif
@@ -43,7 +43,7 @@
  **/
 #ifndef DEBUG_MSG_F
 #define DEBUG_MSG_F(level, ...)     \
-    if (DEBUG && level >= DEBUG) {  \
+    if (DEBUG && level <= DEBUG) {  \
         M5.Lcd.printf(__VA_ARGS__); \
     }
 #endif

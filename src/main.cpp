@@ -30,7 +30,6 @@ BLECharacteristic humiCharacteristic(humiCharacteristicUUID, BLECharacteristic::
 
 BLEServer *pServer = NULL;
 BLEService *pService = NULL;
-BLEAdvertising *pAdvertising = NULL;
 
 bool deviceConnected = false;
 
@@ -61,7 +60,7 @@ void prolongSleep(int seconds) {
  */
 class MyServerCallbacks : public BLEServerCallbacks {
     /**
-     * Update device connected state upon connection.
+     * Upon connection prolong activity timeout and remember connected state.
      */
     void onConnect(BLEServer *pServer) {
         prolongSleep(ACTIVITY_TIMEOUT);
@@ -70,17 +69,12 @@ class MyServerCallbacks : public BLEServerCallbacks {
     };
 
     /**
-     * Update device connected state upon disconnection.
-     * 
-     * Unfortunately, due to problems I am having with the M5Stack, the sensor node refuses to advertise
-     * once it has connected and disconnected from a client. By deep sleeping we update the sensor state
-     * and reset the BLE device.
+     * Upon disconnection restart the server advertising and update connected state.
      */
     void onDisconnect(BLEServer *pServer) {
         DEBUG_MSG_LN(2, "client disconnected");
         deviceConnected = false;
-        M5.Power.deepSleep(SLEEP_MSEC(10));  // ↑ See descripiton! ↑
-        delayMicroseconds(10);
+        pServer->startAdvertising();
     }
 };
 
@@ -90,7 +84,7 @@ class MyServerCallbacks : public BLEServerCallbacks {
 uint8_t *updateRandHumi() {
     prolongSleep(ACTIVITY_TIMEOUT);
     curHumi = (uint8_t)(rand() % 100);
-    // DEBUG_MSG_LN(curHumi);
+    DEBUG_MSG_LN(2, curHumi);
     return &curHumi;
 }
 
@@ -142,10 +136,9 @@ void setup() {
     pService->addCharacteristic(&humiCharacteristic);
 
     // Start service and begin advertising.
-    pAdvertising = pServer->getAdvertising();
-    pAdvertising->addServiceUUID(serviceUUID);
     pService->start();
-    pAdvertising->start();
+    pServer->getAdvertising()->addServiceUUID(serviceUUID);
+    pServer->startAdvertising();
 
     prolongSleep(DUTY_CYCLE_AWAKE);
 }
