@@ -14,6 +14,8 @@
 #include <BLEUtils.h>
 #include <M5Stack.h>
 
+#include "debug.h"
+
 /**
  * BLE Related stuff
  * 
@@ -63,7 +65,7 @@ class MyServerCallbacks : public BLEServerCallbacks {
      */
     void onConnect(BLEServer *pServer) {
         prolongSleep(ACTIVITY_TIMEOUT);
-        M5.Lcd.println("client connected");
+        DEBUG_MSG_LN(2, "client connected");
         deviceConnected = true;
     };
 
@@ -75,7 +77,7 @@ class MyServerCallbacks : public BLEServerCallbacks {
      * and reset the BLE device.
      */
     void onDisconnect(BLEServer *pServer) {
-        M5.Lcd.println("client disconnected");
+        DEBUG_MSG_LN(2, "client disconnected");
         deviceConnected = false;
         M5.Power.deepSleep(SLEEP_MSEC(10));  // ↑ See descripiton! ↑
         delayMicroseconds(10);
@@ -88,7 +90,7 @@ class MyServerCallbacks : public BLEServerCallbacks {
 uint8_t *updateRandHumi() {
     prolongSleep(ACTIVITY_TIMEOUT);
     curHumi = (uint8_t)(rand() % 100);
-    M5.Lcd.println(curHumi);
+    // DEBUG_MSG_LN(curHumi);
     return &curHumi;
 }
 
@@ -115,7 +117,7 @@ void setup() {
     M5.Lcd.clear(BLACK);
     M5.Lcd.setTextColor(WHITE);
     M5.Lcd.setBrightness(75);
-    M5.Lcd.println("Humidity node starting...");
+    DEBUG_MSG_LN(1, "Humidity node starting...");
 
     // Create BLE server with callbacks.
     BLEDevice::init("m5-humidity-1");
@@ -133,8 +135,8 @@ void setup() {
     humiCharacteristic.setCallbacks(new HumiCallBacks());
 
     // Display advertised UUIDs for debbugging.
-    M5.Lcd.printf("- Serv-UUID: %s\n", serviceUUID.toString().c_str());
-    M5.Lcd.printf("- Humi-UUID: %s\n", humiCharacteristic.getUUID().toString().c_str());
+    DEBUG_MSG_F(1, "- Serv-UUID: %s\n", serviceUUID.toString().c_str());
+    DEBUG_MSG_F(1, "- Humi-UUID: %s\n", humiCharacteristic.getUUID().toString().c_str());
 
     // Add characteristics to service.
     pService->addCharacteristic(&humiCharacteristic);
@@ -161,7 +163,7 @@ void clearDisplay() {
  */
 void toggleDutyCycle() {
     dutyCycle = !dutyCycle;
-    M5.Lcd.println("SET DUTY_CYCLE " + String(dutyCycle));
+    DEBUG_MSG_LN(1, "SET DUTY_CYCLE " + String(dutyCycle));
     prolongSleep(DUTY_CYCLE_AWAKE);
 }
 
