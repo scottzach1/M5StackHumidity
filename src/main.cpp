@@ -35,7 +35,7 @@ bool deviceConnected = false;
 /**
  * Duty Cycling Timeouts
  */
-const int DUTY_CYCLE_AWAKE = 2;  // seconds awake
+const int DUTY_CYCLE_AWAKE = 3;  // seconds awake
 const int DUTY_CYCLE_SLEEP = 4;  // seconds asleep
 const int ACTIVITY_TIMEOUT = 8;  // seconds after BLE activity
 
