@@ -1,5 +1,15 @@
-// https://github.com/scottzach1/Project-Beans/blob/master/software_package/development/lib/software/src/debug.h
-
+/**
+ *   ___  ___ ___ | |_| |_ ______ _  ___| |__ / |
+ *  / __|/ __/ _ \| __| __|_  / _` |/ __| '_ \| |
+ *  \__ \ (_| (_) | |_| |_ / / (_| | (__| | | | |
+ *  |___/\___\___/ \__|\__/___\__,_|\___|_| |_|_|
+ *
+ *       Zac Scott (github.com/scottzach1)
+ *
+ * M5StackTemperature - BLE Server for Temperature Sensor
+ * 
+ * Adapted from <https://github.com/scottzach1/Project-Beans/blob/master/software_package/development/lib/software/src/debug.h>
+ */
 #ifndef LIB_SOFTWARE_SRC_DEBUG_H_
 #define LIB_SOFTWARE_SRC_DEBUG_H_
 
